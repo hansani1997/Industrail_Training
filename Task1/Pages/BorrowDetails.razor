@@ -1,0 +1,44 @@
+﻿@page "/bdetails"
+
+@using MudBlazor
+@using Task1.Data
+@inject MudBlazor.ISnackbar Snackbar
+@inject BorrowDetailsServices borrowDetailsService;
+
+<MudTextField @bind-Value="borrowdetail.BorrowDate" Label="Borrowed Date" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+<MudTextField @bind-Value="borrowdata.RecieveDate" Label="Received Date" Variant="Variant.Text" Margin="Margin.Dense"></MudTextField>
+<MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+
+<hr />
+@code {
+	private bool dense = false;
+	private bool hover = true;
+	private string searchString = "";
+
+	private BorrowDetails borrowdetail = new BorrowDetails();
+	private List<BorrowDetails> borrowdetails = new List<BorrowDetails>();
+
+	protected override async void OnInitializedAsync()
+	{
+		GetBorrowDetails();
+	}
+	private void Edit(int id)
+	{
+		
+	}
+	private void Save()
+	{
+		
+	}
+	//get  borrowed details
+	private List<BorrowDetails> GetBDetails()
+	{
+		borrowdetails = borrowDetailsService.GetAllBorrowDetails();
+		return borrowdetails;
+	}
+	private bool FilterFun(BorrowDetails borrowDetail)
+	{
+		if (string.IsNullOrWhiteSpace(searchString)) return true;
+		return false;
+	}
+}

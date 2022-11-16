@@ -1,0 +1,42 @@
+﻿@page "/video"
+
+@using MudBlazor;
+@using Task1.Data
+@inject MudBlazor.ISnackbar Snackbar
+@inject VideoService videoService;
+
+@code {
+	private bool dense = false;
+	private bool hover = true;
+	private string searchString = "";
+
+	private Video video = new Video();
+	private List<Video> videos = new List<Video>();
+
+	protected override async void OnInitialized()
+	{
+		GetVideo();
+	}
+	private void Edit(int id)
+	{
+		//
+	}
+	private void Save()
+	{
+		//
+	}
+	//get all videos
+	private List<Video> GetVideo()
+	{
+		videos = videoService.GetAllVideos();
+		return videos;
+	}
+
+	private bool FilterFun(Video Video)
+	{
+		if (string.IsNullOrWhiteSpace(searchString)) return true;
+		if (Video.Title.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+		return false;
+	}
+
+}

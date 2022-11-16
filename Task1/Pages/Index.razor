@@ -1,0 +1,112 @@
+﻿@page "/"
+
+@using Task1.Data
+@*@inject Task1.IService.IMemberService memberService*@
+@inject MudBlazor.ISnackbar Snackbar
+@inject MemberService memberService
+
+<MudTextField @bind-Value="member.FirstName" Variant="Variant.Text" Margin="Margin.Dense" Label="Member First Name"></MudTextField>
+<MudTextField @bind-Value="member.LastName" Variant="Variant.Text" Margin="Margin.Dense" Label="Member Last Name"></MudTextField>
+<MudTextField @bind-Value="member.ContactNo" Variant="Variant.Text" Margin="Margin.Dense" Label="Member Contact No"></MudTextField>
+
+<MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+
+
+<hr />
+
+<MudTable Items="@GetMembers()" Dense="@dense" Hover="@hover" Filter="new Func<Data.Member, bool>(FilterFunc)" @bind-student="member">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Members</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Member Id</MudTh>
+        <MudTh>First Name</MudTh>
+        <MudTh>Last Name</MudTh>
+        <MudTh>Contact No</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="MemberId">@context.MemberId</MudTd>
+        <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+        <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+        <MudTd DataLabel="Contact No">@context.ContactNo</MudTd>
+        <MudTd DataLabel=" ">
+            <MudFab @onclick="@(() => Edit(context.MemberId))" Color="Color.Primary" Icon="@Icons.Material.Filled.Edit" Size="Size.Small" IconSize="Size.Small" />
+            <MudFab @onclick="@(() => Delete(context.MemberId))" Color="Color.Secondary" Icon="@Icons.Material.Filled.Delete" Size="Size.Small" IconSize="Size.Small" />
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+<MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
+<MudSwitch @bind-Checked="@hover" Color="Color.Secondary">Dence</MudSwitch>
+<MudText Inline="true">Selected: @member?.FirstName</MudText>
+
+
+@code {
+    private bool dense = false;
+    private bool hover = true;
+    private string searchString = "";
+
+    private Member member = new Member();
+    private HashSet<Member> members = new HashSet<Member>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetMembers();
+    }
+
+    private HashSet<Member> GetMembers()
+    {
+        members = GetMembers();
+        return members;
+    }
+
+    private bool FilterFunc(Data.Member Member)
+    {
+        if (string.IsNullOrWhiteSpace(searchString)) return true;
+        if (Member.FirstName.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if (Member.LastName.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        //if (Member.ContactNo.Contains(searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        
+
+        return false;
+    }
+
+    private void Save()
+    {
+            bool resx = false;
+            if (member.MemberId == 0)
+            {
+            resx = memberService.InsertMember(member);
+            }
+            else
+            {
+            resx = memberService.UpdateMember(member);
+            }
+            //MemberService.InsertMember(member);
+            member = new Member();
+            if (resx)
+            {
+                Snackbar.Add("Member Saved", Severity.Success);
+            }
+            GetMembers();
+        }
+    
+
+    private void Edit(int memberId)
+    {
+        member = members.FirstOrDefault(x => x.MemberId == memberId);
+    }
+
+    private void Delete(int MemberId)
+    {
+        memberService.DeleteMember(member);
+        Snackbar.Add("Student Deleted", Severity.Warning);
+        GetMembers();
+    }
+}
